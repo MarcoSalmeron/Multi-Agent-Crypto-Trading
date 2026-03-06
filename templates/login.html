@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Criptol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#0b0e17] text-[#d1d4dc] font-[Inter] min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full bg-[#0b0e17] border-b border-[#2a3045] z-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Logo -->
+                <a href="{{ url_for('index_page') }}" class="flex items-center space-x-2 ml-12">
+                    <img src="{{ url_for('static', filename='img/criptol-logo.png') }}" alt="marca-logo" class="h-12 w-auto">
+                </a>
+
+                <!-- Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="{{ url_for('index_page') }}" class="text-gray-300 hover:text-yellow-400 transition">Inicio</a>
+                    <a href="#" data-modal="aboutModal" class="text-gray-300 hover:text-yellow-400">Nosotros</a>
+                    <a href="#" data-modal="servicesModal" class="text-gray-300 hover:text-yellow-400">Servicios</a>
+                </div>
+
+                <!-- Botón hamburguesa (mobile) -->
+                <div class="md:hidden">
+                    <button class="text-gray-300 hover:text-yellow-400 focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Card -->
+    <div class="flex flex-1 items-center justify-center px-4">
+        <div class="bg-[#131722] border border-[#2a3045] rounded-lg shadow-lg w-full max-w-md p-8 animate-fadeIn">
+            <h1 class="font-[JetBrains Mono] text-2xl font-bold text-[#f0b429] text-center mb-5">Criptol Login</h1>
+            <p class="text-sm text-[#5d6378] text-center mb-6">
+                Accede a tu cuenta para comenzar a operar con nuestro sistema de trading asistido por IA.
+            </p>
+            <form class="space-y-5">
+                <div>
+                    <label for="email"
+                        class="block text-xs text-[#5d6378] font-[JetBrains Mono] uppercase tracking-wider mb-2">Correo</label>
+                    <input type="email" id="email" placeholder="tuemail@ejemplo.com" required
+                        class="w-full px-4 py-2 rounded-md border border-[#2a3045] bg-[#1e2332] text-[#d1d4dc] focus:border-[#f0b429] outline-none transition">
+                </div>
+                <div>
+                    <label for="password"
+                        class="block text-xs text-[#5d6378] font-[JetBrains Mono] uppercase tracking-wider mb-2">Contraseña</label>
+                    <input type="password" id="password" placeholder="********" required
+                        class="w-full px-4 py-2 rounded-md border border-[#2a3045] bg-[#1e2332] text-[#d1d4dc] focus:border-[#f0b429] outline-none transition">
+                </div>
+                <button type="submit"
+                    class="w-full bg-[#f0b429] text-[#0b0e17] font-[JetBrains Mono] font-bold py-3 rounded-md hover:opacity-85 active:scale-95 transition">
+                    Iniciar Sesión
+                </button>
+            </form>
+            <div class="mt-6 text-center text-sm">
+                <a href="#" class="text-[#f0b429] hover:underline">¿Olvidaste tu contraseña?</a>
+                <span class="text-[#5d6378]"> | </span>
+                <a href="#" class="text-[#f0b429] hover:underline">Crear cuenta</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 'Nosotros' -->
+    <div id="aboutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+        <div class="bg-[#131722] border border-[#2a3045] rounded-lg shadow-lg max-w-2xl w-full mx-4">
+            <!-- Header -->
+            <div class="flex justify-between items-center px-6 py-4 border-b border-[#2a3045]">
+                <h5 class="text-white font-bold text-lg">Sobre Criptol</h5>
+                <button onclick="document.getElementById('aboutModal').classList.add('hidden')"
+                    class="text-gray-400 hover:text-white transition">
+                    ✕
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="px-6 py-4 space-y-4 text-[#d1d4dc] text-sm">
+                <p><strong>Criptol</strong> es una empresa ficticia creada con el propósito de demostrar cómo un
+                    <em>Sistema de Trading asistido por agentes inteligentes</em> puede transformar la manera en que
+                    analizamos y operamos en los mercados financieros.
+                </p>
+                <p>Nuestro sistema está diseñado para analizar en tiempo real <strong>criptomonedas</strong>,
+                    <strong>acciones</strong> y otros activos financieros, utilizando técnicas avanzadas de
+                    <em>inteligencia artificial</em> y <em>agentes colaborativos</em>.
+                </p>
+                <p>El objetivo de Criptol es ofrecer a los usuarios una plataforma confiable, rápida y segura que
+                    combine <strong>automatización</strong> con <strong>inteligencia humana</strong>.</p>
+                <p>En resumen, Criptol busca ser un aliado tecnológico para traders e inversionistas, integrando
+                    <em>análisis predictivo</em>, <em>gestión de riesgos</em> y <em>recomendaciones personalizadas</em>.
+                </p>
+            </div>
+            <!-- Footer -->
+            <div class="flex justify-center px-6 py-4 border-t border-[#2a3045]">
+                <button onclick="document.getElementById('aboutModal').classList.add('hidden')"
+                    class="bg-[#2a3045] text-[#d1d4dc] px-4 py-2 rounded hover:bg-[#5d6378] transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 'Servicios' -->
+    <div id="servicesModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+        <div class="bg-[#131722] border border-[#2a3045] rounded-lg shadow-lg max-w-2xl w-full mx-4">
+            <!-- Header -->
+            <div class="flex justify-between items-center px-6 py-4 border-b border-[#2a3045]">
+                <h5 class="text-white font-bold text-lg">Sistema de Trading Asistido por IA</h5>
+                <button onclick="document.getElementById('servicesModal').classList.add('hidden')"
+                    class="text-gray-400 hover:text-white transition">
+                    ✕
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="px-6 py-4 space-y-4 text-[#d1d4dc] text-sm">
+                <p><strong>Criptol</strong> presenta un proyecto ficticio orientado a demostrar cómo un
+                    <em>Sistema de Trading Asistido por Inteligencia Artificial</em> puede transformar la manera en que
+                    se analizan criptomonedas y acciones.
+                </p>
+                <h6 class="font-semibold text-yellow-400">🎯 Objetivo</h6>
+                <p>Crear un sistema que analiza en tiempo real los mercados financieros y recomienda operaciones
+                    con base en datos, modelos predictivos y límites de riesgo.</p>
+                <h6 class="font-semibold text-yellow-400">🧩 Componentes</h6>
+                <ul class="list-disc list-inside space-y-1">
+                    <li><strong>Agente Investigador:</strong> recopila noticias y sentimiento del mercado.</li>
+                    <li><strong>Agente Analista Técnico:</strong> usa modelos (DeepSeek, Gemini, GPT).</li>
+                    <li><strong>Agente de Riesgo:</strong> aplica guardrails para bloquear operaciones peligrosas.</li>
+                    <li><strong>Agente Trader:</strong> ejecuta o simula la operación final.</li>
+                </ul>
+                <h6 class="font-semibold text-yellow-400">⚙️ Herramientas</h6>
+                <p>WebSearch, calculadora de riesgo y simulador de operaciones.</p>
+                <h6 class="font-semibold text-yellow-400">📊 Salidas estructuradas</h6>
+                <p>Genera un <strong>TradingSignal</strong> con confianza, stop-loss y take-profit.</p>
+            </div>
+            <!-- Footer -->
+            <div class="flex justify-center px-6 py-4 border-t border-[#2a3045]">
+                <button onclick="document.getElementById('servicesModal').classList.add('hidden')"
+                    class="bg-[#2a3045] text-[#d1d4dc] px-4 py-2 rounded hover:bg-[#5d6378] transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('[data-modal]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-modal');
+                document.getElementById(target).classList.remove('hidden');
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>
