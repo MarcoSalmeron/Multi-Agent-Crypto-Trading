@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptolDashboard — Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap"  rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+   <link rel="stylesheet" href="{{ url_for('static', path='main.css') }}">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+            sans: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            terminal: {
+              bg: '#0d0f14',
+              panel: '#12151c',
+              border: '#1e2330',
+              accent: '#00d4aa',
+              accentDim: '#00d4aa22',
+              red: '#ff4d6a',
+              redDim: '#ff4d6a22',
+              yellow: '#f5a623',
+              muted: '#4a5568',
+              text: '#c9d1e0',
+              dim: '#6b7a99',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+</head>
+
+<body class="text-sm">
+
+  <!-- Scanline overlay -->
+  <div class="scanline"></div>
+
+  <!-- Notification toast -->
+  <div id="notif-toast" class="panel px-4 py-3 rounded-lg text-xs font-mono min-w-[260px]">
+    <div class="flex items-center gap-2">
+      <span id="notif-icon">✓</span>
+      <span id="notif-msg">Orden ejecutada</span>
+    </div>
+  </div>
+
+  <!-- ─── TOPBAR ────────────────────────────────────────── -->
+  <header class="panel border-b border-terminal-border px-6 py-3 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-terminal-accent animate-pulse"></div>
+        <span class="text-terminal-accent font-bold tracking-widest text-xs text-glow">CRYPTOLDESK</span>
+        <span class="text-terminal-dim text-xs">// v1.2</span>
+      </div>
+      <!-- Ticker strip -->
+      <div class="hidden md:flex items-center gap-6 ml-8">
+        <div class="ticker-row flex items-center gap-2 px-2 py-1 rounded" onclick="setAsset('BTC')">
+          <span class="text-terminal-dim text-xs">BTC</span>
+          <span id="hdr-btc" class="text-terminal-text font-medium text-xs">$67,842</span>
+          <span class="text-terminal-accent text-xs">+2.4%</span>
+        </div>
+        <div class="ticker-row flex items-center gap-2 px-2 py-1 rounded" onclick="setAsset('ETH')">
+          <span class="text-terminal-dim text-xs">ETH</span>
+          <span id="hdr-eth" class="text-terminal-text font-medium text-xs">$3,521</span>
+          <span class="text-terminal-accent text-xs">+1.8%</span>
+        </div>
+        <div class="ticker-row flex items-center gap-2 px-2 py-1 rounded" onclick="setAsset('SOL')">
+          <span class="text-terminal-dim text-xs">SOL</span>
+          <span id="hdr-sol" class="text-terminal-text font-medium text-xs">$184.30</span>
+          <span class="text-terminal-red text-xs">-0.6%</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-terminal-dim text-xs">SALDO_USDT</span>
+        <span id="balance-display" class="text-terminal-accent font-semibold">$24,850.00</span>
+      </div>
+      <div class="w-px h-4 bg-terminal-border"></div>
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-terminal-accent"></div>
+        <span class="text-terminal-dim text-xs">CONECTADO</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── MAIN LAYOUT ───────────────────────────────────── -->
+  <div class="flex h-[calc(100vh-52px)] overflow-hidden">
+
+    <!-- ── LEFT ASIDE: Open Orders ───────────────────────── -->
+    <aside id="aside-orders" class="panel border-r border-terminal-border flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="px-4 py-3 border-b border-terminal-border flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-terminal-accent text-xs">▣</span>
+          <span class="text-terminal-text font-semibold text-xs tracking-wider">ÓRDENES ABIERTAS</span>
+        </div>
+        <span id="open-count" class="text-xs px-2 py-0.5 rounded badge-open">3</span>
+      </div>
+
+      <!-- Asset filter -->
+      <div class="px-4 py-2 border-b border-terminal-border">
+        <div class="relative">
+          <select id="order-filter" class="select-asset w-full text-xs px-3 py-2 rounded" onchange="filterOrders()">
+            <option value="ALL">TODOS LOS ACTIVOS</option>
+            <option value="BTC">BTC / USDT</option>
+            <option value="ETH">ETH / USDT</option>
+            <option value="SOL">SOL / USDT</option>
+          </select>
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-terminal-dim pointer-events-none text-xs">▾</span>
+        </div>
+      </div>
+
+      <!-- Orders list -->
+      <div id="orders-list" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+        <!-- injected by JS -->
+      </div>
+
+      <!-- Stats footer -->
+      <div class="border-t border-terminal-border px-4 py-3">
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <p class="text-terminal-dim mb-0.5">P&L No Real.</p>
+            <p id="unrealized-pnl" class="text-terminal-accent font-semibold">+$342.80</p>
+          </div>
+          <div>
+            <p class="text-terminal-dim mb-0.5">Exposición</p>
+            <p class="text-terminal-text font-semibold">$12,420</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── CENTER: Dashboard ──────────────────────────────── -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+
+      <!-- Asset selector bar -->
+      <div class="panel border-b border-terminal-border px-6 py-3 flex items-center gap-6">
+        <div class="flex items-center gap-3">
+          <span class="text-terminal-dim text-xs">PAR:</span>
+          <div class="flex gap-2">
+            <button onclick="setAsset('BTC')" id="tab-BTC"
+              class="text-xs px-3 py-1.5 rounded font-medium transition-all tab-active">BTC/USDT</button>
+            <button onclick="setAsset('ETH')" id="tab-ETH"
+              class="text-xs px-3 py-1.5 rounded font-medium transition-all tab-inactive">ETH/USDT</button>
+            <button onclick="setAsset('SOL')" id="tab-SOL"
+              class="text-xs px-3 py-1.5 rounded font-medium transition-all tab-inactive">SOL/USDT</button>
+          </div>
+        </div>
+        <div class="h-4 w-px bg-terminal-border"></div>
+        <div class="flex items-center gap-6 text-xs">
+          <div>
+            <span class="text-terminal-dim">PRECIO </span>
+            <span id="current-price" class="text-terminal-accent font-semibold text-glow">$67,842.00</span>
+          </div>
+          <div>
+            <span class="text-terminal-dim">24H </span>
+            <span id="price-change" class="text-terminal-accent">+2.41%</span>
+          </div>
+          <div>
+            <span class="text-terminal-dim">VOL </span>
+            <span class="text-terminal-text">$28.4B</span>
+          </div>
+          <div>
+            <span class="text-terminal-dim">MAX_24H </span>
+            <span class="text-terminal-text" id="high-24h">$68,120</span>
+          </div>
+          <div>
+            <span class="text-terminal-dim">MIN_24H </span>
+            <span class="text-terminal-text" id="low-24h">$66,890</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart placeholder + Trading panel -->
+      <div class="flex-1 flex overflow-hidden">
+
+        <!-- Chart zone -->
+        <div class="flex-1 flex flex-col">
+          <div class="flex-1 flex items-center justify-center"
+            style="background:#0d0f14; border-right:1px solid #1e2330;">
+            <div class="text-center w-full h-full">
+              <div id="chart-container" style="width:100%; height:500px;"></div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Trading panel -->
+        <div class="w-80 flex flex-col panel border-l border-terminal-border overflow-y-auto">
+
+          <!-- Buy / Sell tabs -->
+          <div class="flex border-b border-terminal-border">
+            <button id="side-buy" onclick="setSide('buy')"
+              class="flex-1 py-3 text-xs font-semibold tracking-wider text-terminal-accent border-b-2 border-terminal-accent transition-all">
+              ▲ COMPRAR
+            </button>
+            <button id="side-sell" onclick="setSide('sell')"
+              class="flex-1 py-3 text-xs font-semibold tracking-wider text-terminal-dim border-b-2 border-transparent transition-all hover:text-terminal-red">
+              ▼ VENDER
+            </button>
+          </div>
+
+          <div class="p-4 flex flex-col gap-4">
+
+            <!-- Order type -->
+            <div>
+              <label class="text-terminal-dim text-xs mb-1.5 block">TIPO_ORDEN</label>
+              <div class="flex gap-2">
+                <button id="otype-limit" onclick="setOrderType('limit')"
+                  class="flex-1 text-xs py-1.5 rounded border border-terminal-accent text-terminal-accent bg-terminal-accentDim font-medium">LIMIT</button>
+                <button id="otype-market" onclick="setOrderType('market')"
+                  class="flex-1 text-xs py-1.5 rounded border border-terminal-border text-terminal-dim hover:border-terminal-accent transition-all">MARKET</button>
+                <button id="otype-stop" onclick="setOrderType('stop')"
+                  class="flex-1 text-xs py-1.5 rounded border border-terminal-border text-terminal-dim hover:border-terminal-accent transition-all">STOP</button>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div id="price-field">
+              <label class="text-terminal-dim text-xs mb-1.5 block">PRECIO (USDT)</label>
+              <input id="order-price" type="number" class="input-field w-full px-3 py-2 rounded text-sm"
+                placeholder="0.00" />
+            </div>
+
+            <!-- Amount -->
+            <div>
+              <label class="text-terminal-dim text-xs mb-1.5 block">CANTIDAD</label>
+              <div class="relative">
+                <input id="order-amount" type="number" class="input-field w-full px-3 py-2 rounded text-sm pr-16"
+                  placeholder="0.0000" oninput="calcTotal()" />
+                <span id="amount-unit"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-terminal-dim text-xs">BTC</span>
+              </div>
+            </div>
+
+            <!-- Quick % buttons -->
+            <div class="flex gap-1.5">
+              <button onclick="setPct(25)"
+                class="flex-1 text-xs py-1 rounded border border-terminal-border text-terminal-dim hover:border-terminal-accent hover:text-terminal-accent transition-all">25%</button>
+              <button onclick="setPct(50)"
+                class="flex-1 text-xs py-1 rounded border border-terminal-border text-terminal-dim hover:border-terminal-accent hover:text-terminal-accent transition-all">50%</button>
+              <button onclick="setPct(75)"
+                class="flex-1 text-xs py-1 rounded border border-terminal-border text-terminal-dim hover:border-terminal-accent hover:text-terminal-accent transition-all">75%</button>
+              <button onclick="setPct(100)"
+                class="flex-1 text-xs py-1 rounded border border-terminal-border text-terminal-dim hover:border-terminal-accent hover:text-terminal-accent transition-all">MAX</button>
+            </div>
+
+            <!-- Stop price (conditional) -->
+            <div id="stop-field" class="hidden">
+              <label class="text-terminal-dim text-xs mb-1.5 block">PRECIO_STOP</label>
+              <input id="order-stop" type="number" class="input-field w-full px-3 py-2 rounded text-sm"
+                placeholder="0.00" />
+            </div>
+
+            <!-- Total -->
+            <div class="panel border border-terminal-border rounded p-3">
+              <div class="flex justify-between items-center">
+                <span class="text-terminal-dim text-xs">TOTAL USDT</span>
+                <span id="order-total" class="text-terminal-text font-semibold text-sm">0.00</span>
+              </div>
+              <div class="progress-bar mt-2">
+                <div id="balance-usage" class="progress-fill" style="width:0%"></div>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="text-terminal-dim" style="font-size:10px">Disponible: <span
+                    id="avail-balance">$24,850</span></span>
+                <span id="balance-pct" class="text-terminal-dim" style="font-size:10px">0%</span>
+              </div>
+            </div>
+
+            <!-- Fees -->
+            <div class="flex justify-between text-xs">
+              <span class="text-terminal-dim">COMISIÓN (0.1%)</span>
+              <span id="order-fee" class="text-terminal-text">$0.00</span>
+            </div>
+
+            <!-- Submit -->
+            <button id="submit-btn" onclick="submitOrder()"
+              class="btn-buy w-full py-3 rounded text-sm font-semibold tracking-wider transition-all">
+              ▲ EJECUTAR COMPRA
+            </button>
+          </div>
+
+          <!-- Recent trades -->
+          <div class="border-t border-terminal-border p-4">
+            <p class="text-terminal-dim text-xs mb-3 tracking-wider">TRADES_RECIENTES</p>
+            <div id="recent-trades" class="flex flex-col gap-1.5 text-xs"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ─── CHATBOX ASIDE ────────────────────────────────── -->
+  <div id="chatbox-aside" class="panel border border-terminal-border flex flex-col">
+    <div class="px-4 py-3 border-b border-terminal-border flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-1.5 h-1.5 rounded-full bg-terminal-accent animate-pulse"></div>
+        <span class="text-terminal-accent text-xs font-semibold tracking-wider">CRYPTO_AI</span>
+        <span class="text-terminal-dim text-xs">// asistente</span>
+      </div>
+      <button onclick="toggleChat()"
+        class="text-terminal-dim hover:text-terminal-text text-xs transition-colors">✕</button>
+    </div>
+
+    <div id="chat-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+      <div class="chat-msg-ai px-3 py-2 text-xs text-terminal-text">
+        <p class="text-terminal-accent text-xs mb-1">CRYPTOL AI</p>
+        Hola, soy tu asistente de trading. Puedo ayudarte con análisis de mercado, estrategias y gestión de riesgo. ¿En
+        qué te puedo ayudar?
+      </div>
+    </div>
+
+    <div class="border-t border-terminal-border p-3">
+      <div class="flex gap-2">
+        <input id="chat-input" type="text" class="input-field flex-1 px-3 py-2 rounded text-xs"
+          placeholder="Escribe tu consulta..." onkeydown="if(event.key==='Enter') sendChat()" />
+        <button onclick="sendChat()" class="btn-buy px-3 py-2 rounded text-xs font-medium">▶</button>
+      </div>
+      <div class="flex gap-2 mt-2 flex-wrap">
+        <button onclick="quickChat('¿Análisis BTC?')"
+          class="text-terminal-dim border border-terminal-border text-xs px-2 py-1 rounded hover:border-terminal-accent hover:text-terminal-accent transition-all">BTC
+          análisis</button>
+        <button onclick="quickChat('¿Soporte ETH?')"
+          class="text-terminal-dim border border-terminal-border text-xs px-2 py-1 rounded hover:border-terminal-accent hover:text-terminal-accent transition-all">ETH
+          soporte</button>
+        <button onclick="quickChat('¿Risk management?')"
+          class="text-terminal-dim border border-terminal-border text-xs px-2 py-1 rounded hover:border-terminal-accent hover:text-terminal-accent transition-all">Riesgo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating AI bar -->
+  <div id="chat-toggle-bar" class="fixed bottom-4 left-1/2 transform -translate-x-1/2
+            w-80 px-4 py-2 rounded-lg
+            border-2 border-green-400
+            bg-black/40 text-green-400
+            flex items-center justify-between
+            shadow-lg transition-all cursor-pointer" onclick="toggleChat()" title="Asistente AI">
+    <span class="text-xs font-medium tracking-wide">Pregunte a CRYPTOL AI AGENT</span>
+  </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="{{ url_for('static', path='main.js') }}"></script>
+</body>
+
+</html>
