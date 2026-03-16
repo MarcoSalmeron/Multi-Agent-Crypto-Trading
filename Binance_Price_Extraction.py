@@ -2,9 +2,9 @@ import json
 import threading
 import time
 from collections import deque
+from datetime import datetime
 
 import websocket
-
 
 VALID_INTERVALS = [
     "1s", "1m", "3m", "5m", "15m", "30m",
@@ -14,18 +14,6 @@ VALID_INTERVALS = [
 
 
 class CryptoChart:
-    """
-    Clase que mantiene la conexión WebSocket con Binance y acumula
-    datos OHLCV. No depende de IPython; la visualización la hace
-    el frontend via Flask + SSE.
-
-    Parámetros
-    ----------
-    symbol      : str  — Par de trading, ej. 'btcusdt'
-    interval    : str  — Intervalo de vela, ej. '1m'
-    max_candles : int  — Máximo de velas a mantener en memoria
-    """
-
     BINANCE_WS_BASE = "wss://stream.binance.com:9443/ws"
 
     def __init__(
@@ -39,17 +27,12 @@ class CryptoChart:
         self._thread: threading.Thread | None = None
         self._lock = threading.Lock()
 
-        # Cola de callbacks: otros módulos pueden suscribirse a nuevas velas
         self._on_candle_callbacks: list = []
 
         self._symbol = ""
         self._interval = ""
         self._set_params(symbol, interval)
         self._reset_data()
-
-    # ------------------------------------------------------------------
-    # Propiedades
-    # ------------------------------------------------------------------
 
     @property
     def symbol(self) -> str:
@@ -63,12 +46,7 @@ class CryptoChart:
     def socket_url(self) -> str:
         return f"{self.BINANCE_WS_BASE}/{self._symbol}@kline_{self._interval}"
 
-    # ------------------------------------------------------------------
-    # API pública
-    # ------------------------------------------------------------------
-
     def start(self, block: bool = False) -> None:
-        """Inicia la conexión WebSocket."""
         self._ws = websocket.WebSocketApp(
             self.socket_url,
             on_message=self._on_message,
@@ -88,21 +66,18 @@ class CryptoChart:
             self._thread.start()
 
     def stop(self) -> None:
-        """Cierra la conexión activa."""
         if self._ws:
             self._ws.close()
             self._ws = None
 
     def change_symbol(self, symbol: str, interval: str | None = None) -> None:
-        """Cambia símbolo / intervalo en caliente."""
         self.stop()
-        time.sleep(0.5)  # Pequeña pausa para cierre limpio
+        time.sleep(0.5)
         self._set_params(symbol, interval or self._interval)
         self._reset_data()
         self.start()
 
     def get_data(self) -> dict:
-        """Snapshot thread-safe de los datos actuales."""
         with self._lock:
             return {
                 "symbol": self._symbol.upper(),
@@ -112,22 +87,12 @@ class CryptoChart:
                 "lows": list(self.lows),
                 "closes": list(self.closes),
                 "volumes": list(self.volumes),
+                "timestamps": [ts.isoformat() for ts in self.timestamps],  # ✅ ISO strings
                 "candle_count": len(self.closes),
             }
 
     def on_candle(self, callback) -> None:
-        """
-        Registra un callback que se ejecuta al cerrar cada vela.
-        El callback recibe el snapshot actual como dict.
-
-        Ejemplo:
-            chart.on_candle(lambda data: print(data["closes"][-1]))
-        """
         self._on_candle_callbacks.append(callback)
-
-    # ------------------------------------------------------------------
-    # Internos — configuración
-    # ------------------------------------------------------------------
 
     def _set_params(self, symbol: str, interval: str) -> None:
         symbol = symbol.lower().strip()
@@ -146,10 +111,7 @@ class CryptoChart:
             self.highs: deque[float] = deque(maxlen=self.max_candles)
             self.lows: deque[float] = deque(maxlen=self.max_candles)
             self.volumes: deque[float] = deque(maxlen=self.max_candles)
-
-    # ------------------------------------------------------------------
-    # Callbacks WebSocket
-    # ------------------------------------------------------------------
+            self.timestamps: deque[datetime] = deque(maxlen=self.max_candles)  # ✅ nuevo
 
     def _on_message(self, ws, message: str) -> None:
         json_message = json.loads(message)
@@ -164,10 +126,10 @@ class CryptoChart:
                 self.highs.append(float(candle["h"]))
                 self.lows.append(float(candle["l"]))
                 self.volumes.append(float(candle["v"]))
+                self.timestamps.append(datetime.fromtimestamp(candle["t"] / 1000))  # ✅ guardar datetime
 
             snapshot = self.get_data()
 
-            # Notificar a todos los suscriptores
             for cb in self._on_candle_callbacks:
                 try:
                     cb(snapshot)
