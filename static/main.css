@@ -1,0 +1,277 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0d0f14;
+    color: #c9d1e0;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #12151c;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e2330;
+    border-radius: 2px;
+}
+
+.scanline {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(to bottom,
+            transparent 0px,
+            transparent 3px,
+            rgba(0, 0, 0, 0.04) 3px,
+            rgba(0, 0, 0, 0.04) 4px);
+    z-index: 9999;
+}
+
+.glow-green {
+    box-shadow: 0 0 12px #00d4aa33;
+}
+
+.glow-red {
+    box-shadow: 0 0 12px #ff4d6a33;
+}
+
+.text-glow {
+    text-shadow: 0 0 8px #00d4aa99;
+}
+
+.panel {
+    background: #12151c;
+    border: 1px solid #1e2330;
+}
+
+.badge-buy {
+    background: #00d4aa18;
+    color: #00d4aa;
+    border: 1px solid #00d4aa44;
+}
+
+.badge-sell {
+    background: #ff4d6a18;
+    color: #ff4d6a;
+    border: 1px solid #ff4d6a44;
+}
+
+.badge-open {
+    background: #f5a62318;
+    color: #f5a623;
+    border: 1px solid #f5a62344;
+}
+
+.badge-closed {
+    background: #6b7a9918;
+    color: #6b7a99;
+    border: 1px solid #6b7a9944;
+}
+
+.btn-buy {
+    background: linear-gradient(135deg, #00d4aa18, #00d4aa10);
+    border: 1px solid #00d4aa66;
+    color: #00d4aa;
+    transition: all .15s;
+}
+
+.btn-buy:hover {
+    background: #00d4aa22;
+    box-shadow: 0 0 16px #00d4aa44;
+}
+
+.btn-sell {
+    background: linear-gradient(135deg, #ff4d6a18, #ff4d6a10);
+    border: 1px solid #ff4d6a66;
+    color: #ff4d6a;
+    transition: all .15s;
+}
+
+.btn-sell:hover {
+    background: #ff4d6a22;
+    box-shadow: 0 0 16px #ff4d6a44;
+}
+
+.input-field {
+    background: #0d0f14;
+    border: 1px solid #1e2330;
+    color: #c9d1e0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    transition: border-color .15s;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #00d4aa66;
+}
+
+.select-asset {
+    background: #0d0f14;
+    border: 1px solid #1e2330;
+    color: #c9d1e0;
+    font-family: 'JetBrains Mono', monospace;
+    appearance: none;
+    cursor: pointer;
+}
+
+.tab-active {
+    border-bottom: 2px solid #00d4aa;
+    color: #00d4aa;
+}
+
+.tab-inactive {
+    border-bottom: 2px solid transparent;
+    color: #6b7a99;
+}
+
+.tab-inactive:hover {
+    color: #c9d1e0;
+}
+
+/* ASIDE ORDERS */
+#aside-orders {
+    width: 320px;
+    min-width: 320px;
+    transition: all .3s ease;
+}
+
+/* CHATBOX ASIDE */
+#chatbox-aside {
+    position: fixed;
+    bottom: 0;
+    left: 50%;                /* lo coloca en el centro horizontal */
+    transform: translate(-50%, 100%); /* -50% lo centra, 100% lo oculta abajo */
+    width: 480px;
+    height: 480px;
+    z-index: 100;
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+    border-radius: 12px 12px 0 0; /* redondeado arriba */
+}
+
+#chatbox-aside.open {
+    transform: translate(-50%, 0); /* aparece desde abajo centrado */
+}
+
+#chat-toggle-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    /* lo coloca en el centro horizontal */
+    transform: translateX(-50%);
+    /* corrige para centrar el botón */
+    z-index: 101;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: #12151c;
+    border: 1px solid #00d4aa44;
+    color: #00d4aa;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    box-shadow: 0 4px 24px #00000066, 0 0 16px #00d4aa22;
+}
+
+#chat-toggle-btn:hover {
+    box-shadow: 0 4px 24px #00000099, 0 0 24px #00d4aa44;
+}
+
+.chat-msg-user {
+    background: #00d4aa18;
+    border: 1px solid #00d4aa22;
+    border-radius: 8px 8px 2px 8px;
+    align-self: flex-end;
+    max-width: 85%;
+}
+
+.chat-msg-ai {
+    background: #1e2330;
+    border: 1px solid #ffffff0a;
+    border-radius: 8px 8px 8px 2px;
+    align-self: flex-start;
+    max-width: 85%;
+}
+
+.price-flash-up {
+    animation: flashUp .4s ease;
+}
+
+.price-flash-dn {
+    animation: flashDn .4s ease;
+}
+
+@keyframes flashUp {
+    0% {
+        color: #00d4aa;
+        text-shadow: 0 0 12px #00d4aaaa;
+    }
+
+    100% {
+        color: inherit;
+        text-shadow: none;
+    }
+}
+
+@keyframes flashDn {
+    0% {
+        color: #ff4d6a;
+        text-shadow: 0 0 12px #ff4d6aaa;
+    }
+
+    100% {
+        color: inherit;
+        text-shadow: none;
+    }
+}
+
+.ticker-row:hover {
+    background: #ffffff06;
+    cursor: pointer;
+}
+
+.order-row:hover {
+    background: #ffffff06;
+}
+
+.progress-bar {
+    height: 3px;
+    background: #1e2330;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #00d4aa, #00ffcc);
+    transition: width .5s ease;
+}
+
+#notif-toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 200;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all .3s ease;
+    pointer-events: none;
+}
+
+#notif-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
