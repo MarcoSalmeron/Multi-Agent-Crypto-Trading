@@ -308,8 +308,8 @@
     <div class="px-4 py-3 border-b border-terminal-border flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div class="w-1.5 h-1.5 rounded-full bg-terminal-accent animate-pulse"></div>
-        <span class="text-terminal-accent text-xs font-semibold tracking-wider">CRYPTO_AI</span>
-        <span class="text-terminal-dim text-xs">// asistente</span>
+        <span class="text-terminal-accent text-xs font-semibold tracking-wider">CRYPTOL AI</span>
+        <span class="text-terminal-dim text-xs">// agente</span>
       </div>
       <button onclick="toggleChat()"
         class="text-terminal-dim hover:text-terminal-text text-xs transition-colors">✕</button>
@@ -318,7 +318,7 @@
     <div id="chat-messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
       <div class="chat-msg-ai px-3 py-2 text-xs text-terminal-text">
         <p class="text-terminal-accent text-xs mb-1">CRYPTOL AI</p>
-        Hola, soy tu asistente de trading. Puedo ayudarte con análisis de mercado, estrategias y gestión de riesgo. ¿En
+        Hola, soy tu agente de trading. Puedo ayudarte con análisis de mercado, estrategias y gestión de riesgo. ¿En
         qué te puedo ayudar?
       </div>
     </div>
@@ -328,16 +328,6 @@
         <input id="chat-input" type="text" class="input-field flex-1 px-3 py-2 rounded text-xs"
           placeholder="Escribe tu consulta..." onkeydown="if(event.key==='Enter') sendChat()" />
         <button onclick="sendChat()" class="btn-buy px-3 py-2 rounded text-xs font-medium">▶</button>
-      </div>
-      <div class="flex gap-2 mt-2 flex-wrap">
-        <button onclick="quickChat('¿Análisis BTC?')"
-          class="text-terminal-dim border border-terminal-border text-xs px-2 py-1 rounded hover:border-terminal-accent hover:text-terminal-accent transition-all">BTC
-          análisis</button>
-        <button onclick="quickChat('¿Soporte ETH?')"
-          class="text-terminal-dim border border-terminal-border text-xs px-2 py-1 rounded hover:border-terminal-accent hover:text-terminal-accent transition-all">ETH
-          soporte</button>
-        <button onclick="quickChat('¿Risk management?')"
-          class="text-terminal-dim border border-terminal-border text-xs px-2 py-1 rounded hover:border-terminal-accent hover:text-terminal-accent transition-all">Riesgo</button>
       </div>
     </div>
   </div>
