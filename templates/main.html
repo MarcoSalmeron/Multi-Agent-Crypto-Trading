@@ -64,27 +64,17 @@
       </div>
       <!-- Ticker strip -->
       <div class="hidden md:flex items-center gap-6 ml-8">
-        <div class="ticker-row flex items-center gap-2 px-2 py-1 rounded" onclick="setAsset('BTC')">
+        <div class="ticker-row flex items-center gap-2 px-2 py-1 rounded">
           <span class="text-terminal-dim text-xs">BTC</span>
-          <span id="hdr-btc" class="text-terminal-text font-medium text-xs">$67,842</span>
-          <span class="text-terminal-accent text-xs">+2.4%</span>
-        </div>
-        <div class="ticker-row flex items-center gap-2 px-2 py-1 rounded" onclick="setAsset('ETH')">
-          <span class="text-terminal-dim text-xs">ETH</span>
-          <span id="hdr-eth" class="text-terminal-text font-medium text-xs">$3,521</span>
-          <span class="text-terminal-accent text-xs">+1.8%</span>
-        </div>
-        <div class="ticker-row flex items-center gap-2 px-2 py-1 rounded" onclick="setAsset('SOL')">
-          <span class="text-terminal-dim text-xs">SOL</span>
-          <span id="hdr-sol" class="text-terminal-text font-medium text-xs">$184.30</span>
-          <span class="text-terminal-red text-xs">-0.6%</span>
+          <span id="hdr-btc" class="text-terminal-text font-medium text-xs">--</span>
+          <span class="text-terminal-accent text-xs">--</span>
         </div>
       </div>
     </div>
     <div class="flex items-center gap-4">
       <div class="flex items-center gap-2">
         <span class="text-terminal-dim text-xs">SALDO_USDT</span>
-        <span id="balance-display" class="text-terminal-accent font-semibold">$24,850.00</span>
+        <span id="balance-display" class="text-terminal-accent font-semibold">--</span>
       </div>
       <div class="w-px h-4 bg-terminal-border"></div>
       <div class="flex items-center gap-2">
@@ -105,17 +95,15 @@
           <span class="text-terminal-accent text-xs">▣</span>
           <span class="text-terminal-text font-semibold text-xs tracking-wider">ÓRDENES ABIERTAS</span>
         </div>
-        <span id="open-count" class="text-xs px-2 py-0.5 rounded badge-open">3</span>
+        <span id="open-count" class="text-xs px-2 py-0.5 rounded badge-open">0</span>
       </div>
 
       <!-- Asset filter -->
       <div class="px-4 py-2 border-b border-terminal-border">
         <div class="relative">
           <select id="order-filter" class="select-asset w-full text-xs px-3 py-2 rounded" onchange="filterOrders()">
-            <option value="ALL">TODOS LOS ACTIVOS</option>
+            <option value="ALL">TODOS</option>
             <option value="BTC">BTC / USDT</option>
-            <option value="ETH">ETH / USDT</option>
-            <option value="SOL">SOL / USDT</option>
           </select>
           <span class="absolute right-3 top-1/2 -translate-y-1/2 text-terminal-dim pointer-events-none text-xs">▾</span>
         </div>
@@ -131,11 +119,11 @@
         <div class="grid grid-cols-2 gap-2 text-xs">
           <div>
             <p class="text-terminal-dim mb-0.5">P&L No Real.</p>
-            <p id="unrealized-pnl" class="text-terminal-accent font-semibold">+$342.80</p>
+            <p id="unrealized-pnl" class="text-terminal-accent font-semibold">--</p>
           </div>
           <div>
             <p class="text-terminal-dim mb-0.5">Exposición</p>
-            <p class="text-terminal-text font-semibold">$12,420</p>
+            <p id="exposure-value" class="text-terminal-text font-semibold">--</p>
           </div>
         </div>
       </div>
@@ -151,33 +139,29 @@
           <div class="flex gap-2">
             <button onclick="setAsset('BTC')" id="tab-BTC"
               class="text-xs px-3 py-1.5 rounded font-medium transition-all tab-active">BTC/USDT</button>
-            <button onclick="setAsset('ETH')" id="tab-ETH"
-              class="text-xs px-3 py-1.5 rounded font-medium transition-all tab-inactive">ETH/USDT</button>
-            <button onclick="setAsset('SOL')" id="tab-SOL"
-              class="text-xs px-3 py-1.5 rounded font-medium transition-all tab-inactive">SOL/USDT</button>
           </div>
         </div>
         <div class="h-4 w-px bg-terminal-border"></div>
         <div class="flex items-center gap-6 text-xs">
           <div>
             <span class="text-terminal-dim">PRECIO </span>
-            <span id="current-price" class="text-terminal-accent font-semibold text-glow">$67,842.00</span>
+            <span id="current-price" class="text-terminal-accent font-semibold text-glow">--</span>
           </div>
           <div>
             <span class="text-terminal-dim">24H </span>
-            <span id="price-change" class="text-terminal-accent">+2.41%</span>
+            <span id="price-change" class="text-terminal-accent">--</span>
           </div>
           <div>
             <span class="text-terminal-dim">VOL </span>
-            <span class="text-terminal-text">$28.4B</span>
+            <span id="vol-24h" class="text-terminal-text">--</span>
           </div>
           <div>
             <span class="text-terminal-dim">MAX_24H </span>
-            <span class="text-terminal-text" id="high-24h">$68,120</span>
+            <span class="text-terminal-text" id="high-24h">--</span>
           </div>
           <div>
             <span class="text-terminal-dim">MIN_24H </span>
-            <span class="text-terminal-text" id="low-24h">$66,890</span>
+            <span class="text-terminal-text" id="low-24h">--</span>
           </div>
         </div>
       </div>
@@ -274,7 +258,7 @@
               </div>
               <div class="flex justify-between mt-1">
                 <span class="text-terminal-dim" style="font-size:10px">Disponible: <span
-                    id="avail-balance">$24,850</span></span>
+                    id="avail-balance">--</span></span>
                 <span id="balance-pct" class="text-terminal-dim" style="font-size:10px">0%</span>
               </div>
             </div>
